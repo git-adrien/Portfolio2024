@@ -1,7 +1,8 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
-
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
 /**
  * Base
  */
@@ -13,21 +14,73 @@ const canvas = document.querySelector('canvas.webgl')
 
 // Scene
 const scene = new THREE.Scene()
+scene.background = new THREE.Color( 0x000000 );
+
+
+
+// Axes helper
+const axesHelper = new THREE.AxesHelper()
+// scene.add(axesHelper)
+
 
 /**
  * Textures
  */
 const textureLoader = new THREE.TextureLoader()
+const matcapTexture =  textureLoader.load('/textures/matcaps/2.png')
+matcapTexture.colorSpace = THREE.SRGBColorSpace
+
 
 /**
- * Object
+ * Fonts
  */
-const cube = new THREE.Mesh(
-    new THREE.BoxGeometry(1, 1, 1),
-    new THREE.MeshBasicMaterial()
+const fontloader = new FontLoader()
+
+fontloader.load(
+    'fonts/Terminal Grotesque_Regular.json',
+    (font) => {
+        const textGeometry = new TextGeometry(
+            '    418.Studio \n Waiting Room',{
+                font: font,
+                size: 0.5,
+                height: 0.2,
+                curveSegments:19,
+                // bevelEnabled: true,
+                // bevelThickness: 0.03,
+                // bevelSize:0.03,
+                // bevelOffset:0,
+                // bevelSegments:19
+            }
+        )
+        textGeometry.computeBoundingBox()
+        textGeometry.center()
+
+        const material = new THREE.MeshNormalMaterial()
+        const text = new THREE.Mesh(textGeometry,material)
+        text.rotation.y = Math.PI / 2
+        scene.add(text)
+
+        const donutGeometry = new THREE.TorusGeometry(0.3, 0.2,20,30)
+
+        for(let i = 0; i<=1500; i++){
+            const donut = new THREE.Mesh(donutGeometry,material)
+
+            donut.position.x = (Math.random() - 0.5) * 35
+            donut.position.y = (Math.random() - 0.5) * 35
+            donut.position.z = (Math.random() - 0.5) * 35
+
+
+            donut.rotation.x = Math.random() * Math.PI
+            donut.rotation.y = Math.random() * Math.PI
+
+            const scale = Math.random()
+            donut.scale.set(scale,scale,scale)
+
+            scene.add(donut)
+        }
+    }
 )
 
-scene.add(cube)
 
 /**
  * Sizes
@@ -59,12 +112,24 @@ window.addEventListener('resize', () =>
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
 camera.position.x = 1
 camera.position.y = 1
-camera.position.z = 2
+camera.position.z = 3
 scene.add(camera)
+
+
+// onmousemove = function(e){
+//     camera.position.x = ((e.clientX / window.innerWidth) * 1 ).toFixed(3) 
+//     camera.position.y = ((e.clientX / window.innerHeight) * 1 ).toFixed(3)
+// }
+
+
+
 
 // Controls
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
+controls.autoRotate = true
+controls.autoRotateSpeed = 0.3
+controls.cursor
 
 /**
  * Renderer
@@ -83,7 +148,7 @@ const clock = new THREE.Clock()
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
-
+    
     // Update controls
     controls.update()
 
