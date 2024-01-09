@@ -57,10 +57,9 @@ fontloader.load(
 
         const material = new THREE.MeshNormalMaterial()
         const text = new THREE.Mesh(textGeometry,material)
-        text.rotation.y = Math.PI / 2
         scene.add(text)
 
-        const donutGeometry = new THREE.TorusGeometry(0.3, 0.2,20,30)
+        const donutGeometry = new THREE.BoxGeometry( 1, 1, 1 )
 
         for(let i = 0; i<=1500; i++){
             const donut = new THREE.Mesh(donutGeometry,material)
@@ -73,11 +72,40 @@ fontloader.load(
             donut.rotation.x = Math.random() * Math.PI
             donut.rotation.y = Math.random() * Math.PI
 
-            const scale = Math.random()
+            const scale = Math.random() * Math.PI / 7
             donut.scale.set(scale,scale,scale)
 
             scene.add(donut)
         }
+    }
+)
+
+const fontloader2 = new FontLoader()
+
+fontloader2.load(
+    'fonts/Terminal Grotesque_Regular.json',
+    (font) => {
+        const textGeometry = new TextGeometry(
+            'Bientôt',{
+                font: font,
+                size: 15,
+                height: 0.2,
+                curveSegments:19,
+                // bevelEnabled: true,
+                // bevelThickness: 0.03,
+                // bevelSize:0.03,
+                // bevelOffset:0,
+                // bevelSegments:19
+            }
+        )
+        textGeometry.computeBoundingBox()
+        textGeometry.center()
+
+        const material = new THREE.MeshNormalMaterial()
+        const text = new THREE.Mesh(textGeometry,material)
+        text.position.y = 30
+        scene.add(text)
+
     }
 )
 
@@ -112,16 +140,8 @@ window.addEventListener('resize', () =>
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
 camera.position.x = 1
 camera.position.y = 1
-camera.position.z = 3
+camera.position.z = 4
 scene.add(camera)
-
-
-// onmousemove = function(e){
-//     camera.position.x = ((e.clientX / window.innerWidth) * 1 ).toFixed(3) 
-//     camera.position.y = ((e.clientX / window.innerHeight) * 1 ).toFixed(3)
-// }
-
-
 
 
 // Controls
